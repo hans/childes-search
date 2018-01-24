@@ -32,7 +32,7 @@ def main(args):
   axs[1].set_xlabel("adj type")
   axs[1].set_ylabel("type/token ratio")
 
-  plt.tight_layout()
+  plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
   if args.out:
     plt.savefig(args.out)
