@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import sys
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -21,8 +22,10 @@ def main(args):
   # Plot type/token ratios.
   token_frequencies = df[2].value_counts()
   type_frequencies = df.groupby(2).agg({0: 'nunique'}).reindex(token_frequencies.index)
-  type_token_ratios = type_frequencies.div(token_frequencies, axis=0).reset_index()
-  sns.barplot(x="index", y=0, data=type_token_ratios, ax=axs[1])
+  type_token_ratios = type_frequencies.div(token_frequencies, axis=0)
+  type_token_ratios = type_token_ratios.rename({0: "type_token_ratio"}, axis=1).reset_index()
+
+  sns.barplot(x="index", y="type_token_ratio", data=type_token_ratios, ax=axs[1])
 
   # Type frequencies
   # sns.barplot(x="index", y=0, data=type_frequencies.reset_index(), ax=axs[2])
@@ -41,6 +44,12 @@ def main(args):
     plt.savefig(args.out)
   else:
     plt.show()
+
+  # Print corpus statistics.
+  ret = type_token_ratios.copy()
+  ret["corpus"] = args.file
+  ret = ret.assign(token_frequency=token_frequencies.values)
+  ret.to_csv(sys.stdout, sep="\t")
 
 
 if __name__ == '__main__':
