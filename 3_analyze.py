@@ -18,11 +18,14 @@ def main(args):
   # Plot adjective type histogram.
   sns.countplot(x=2, order=adj_type_order, data=df, ax=axs[0])
 
-  # Calculate type/token frequencies.
+  # Plot type/token ratios.
   token_frequencies = df[2].value_counts()
   type_frequencies = df.groupby(2).agg({0: 'nunique'}).reindex(token_frequencies.index)
   type_token_ratios = type_frequencies.div(token_frequencies, axis=0).reset_index()
   sns.barplot(x="index", y=0, data=type_token_ratios, ax=axs[1])
+
+  # Type frequencies
+  # sns.barplot(x="index", y=0, data=type_frequencies.reset_index(), ax=axs[2])
 
   axs[0].set_title("token frequency")
   axs[0].set_xlabel("adj type")
