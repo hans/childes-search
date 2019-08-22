@@ -3,6 +3,7 @@ Output CoNLL-U parse file from CHILDES corpus.
 """
 
 from argparse import ArgumentParser
+from pathlib import Path
 import sys
 
 import nltk
@@ -12,10 +13,6 @@ from nltk.corpus.reader import CHILDESCorpusReader
 def print_conllu(sentence, out):
   if not sentence or sentence[0][0] == "xxx":
     # ???
-    return
-
-  # Ignore sentences with MWEs. TODO does this create a bad sampling bias?
-  if any("~" in word for word, _, _ in sentence):
     return
 
   # The dependency relation format uses its own indices. First resolve these
@@ -39,9 +36,12 @@ def print_conllu(sentence, out):
 
 
 def main(args):
-  corpus = CHILDESCorpusReader(args.dir, args.glob)
+  corpus = CHILDESCorpusReader(str(args.path.parent), str(args.path.name))
+  # fit their strange api :)
+  speaker = "ALL" if args.speakers == ["ALL"] else args.speakers
+
   for fileid in corpus.fileids():
-    for sentence in corpus.words(fileid, relation=True):
+    for sentence in corpus.words(fileid, relation=True, speaker=speaker):
       try:
         print_conllu(sentence, sys.stdout)
       except:
@@ -52,7 +52,7 @@ def main(args):
 if __name__ == '__main__':
   p = ArgumentParser()
 
-  p.add_argument("dir")
-  p.add_argument("glob", default="*.xml")
+  p.add_argument("path", type=Path)
+  p.add_argument("--speakers", default="ALL", type=lambda speakers: speakers.split(","))
 
   main(p.parse_args())
