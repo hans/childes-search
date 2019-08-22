@@ -1,0 +1,3 @@
+[submodule "dep_tregex"]
+	path = dep_tregex
+	url = https://github.com/yandex/dep_tregex
